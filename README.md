@@ -1,16 +1,24 @@
-# bb_ble_task_1
+# Info Form Flutter Application
 
-A new Flutter project.
+This Flutter application allows users to fill out a form with their personal information, including name, age, email, gender, employment status, date of birth, and address. The data is saved to a server, and users can update or delete their existing information, which is also saved as a PDF.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- User can enter their personal details (name, age, email, gender, employment status, date of birth, and address).
+- Form validation to ensure correct input.
+- Users can upload their details and generate a PDF.
+- Users can update their existing information and replace the PDF.
+- Users can delete their stored information and associated PDF from the server.
+- Integration with Firebase for data storage and SFTP server for PDF uploads.
 
-A few resources to get you started if this is your first Flutter project:
+## Screenshots
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+<!-- Include screenshots of the app interface -->
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/your-username/info-form-flutter-app.git
+   cd info-form-flutter-app
