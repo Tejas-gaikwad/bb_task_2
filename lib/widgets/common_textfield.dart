@@ -53,11 +53,3 @@ class CommonTextfield extends StatelessWidget {
     );
   }
 }
-
-
-//  (value) {
-//         if (value == null || value.isEmpty) {
-//           return 'Please enter your age';
-//         }
-//         return null;
-//       },

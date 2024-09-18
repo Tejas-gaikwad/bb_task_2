@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../services/common_services.dart';
 import '../widgets/common_textfield.dart';
-import 'pdf_view_screen.dart'; // For formatting the date
 
 class InfoFormScreen extends StatefulWidget {
   @override
@@ -12,22 +10,27 @@ class InfoFormScreen extends StatefulWidget {
 
 class _InfoFormScreenState extends State<InfoFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  String name = '';
-  String age = '';
-  String email = '';
+
   String dob = '';
   String? gender;
   String? employmentStatus;
-  String employeeAddress = '';
   DateTime? _selectedDate;
-  List<String> genderOptions = ['Male', 'Female', 'Other'];
-  List<String> employmentStatusOptions = ['Employed', 'Unemployed', 'Student'];
+
+  final List<String> genderOptions = ['Male', 'Female', 'Other'];
+  final List<String> employmentStatusOptions = [
+    'Employed',
+    'Unemployed',
+    'Student'
+  ];
+
   late TextEditingController usernameController;
   late TextEditingController ageController;
   late TextEditingController emailIdController;
   late TextEditingController employeeAddressController;
+
+  bool loading = false;
+  bool deleteLoading = false;
   Map<String, dynamic>? retrievedData;
-  bool makeEditable = true;
 
   @override
   void initState() {
@@ -39,23 +42,19 @@ class _InfoFormScreenState extends State<InfoFormScreen> {
     initializeData();
   }
 
-  initializeData() async {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      retrievedData = await Services.getJsonData();
-      if (retrievedData == null) {
-        makeEditable = true;
-      } else {
-        makeEditable = false;
-      }
-      usernameController.text = retrievedData?['name'] ?? "";
-      ageController.text = retrievedData?['age'] ?? "";
-      emailIdController.text = retrievedData?['email'] ?? "";
-      employeeAddressController.text = retrievedData?['address'] ?? "";
-      gender = retrievedData?['gender'] ?? "";
-      dob = retrievedData?['dob'] ?? "";
-      employmentStatus = retrievedData?['employmentStatus'] ?? "";
-      setState(() {});
-    });
+  Future<void> initializeData() async {
+    retrievedData = await Services.getJsonData();
+    if (retrievedData != null && retrievedData!.isNotEmpty) {
+      setState(() {
+        usernameController.text = retrievedData?['name'] ?? "";
+        ageController.text = retrievedData?['age'] ?? "";
+        emailIdController.text = retrievedData?['email'] ?? "";
+        employeeAddressController.text = retrievedData?['address'] ?? "";
+        gender = retrievedData?['gender'] ?? "";
+        dob = retrievedData?['dob'] ?? "";
+        employmentStatus = retrievedData?['employmentStatus'] ?? "";
+      });
+    }
   }
 
   @override
@@ -68,347 +67,192 @@ class _InfoFormScreenState extends State<InfoFormScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
-            children: [
-              CommonTextfield(
-                hintText: 'Name',
-                enabled: makeEditable,
-                controller: usernameController,
-                onSaved: (value) {
-                  name = value!;
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              CommonTextfield(
-                hintText: "Age",
-                controller: ageController,
-                enabled: makeEditable,
-                keyboardType: TextInputType.number,
-                onSaved: (value) {
-                  age = value!;
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your age';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              CommonTextfield(
-                hintText: 'Email ID',
-                controller: emailIdController,
-                enabled: makeEditable,
-                keyboardType: TextInputType.emailAddress,
-                onSaved: (value) {
-                  email = value!;
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email ID';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () async {
-                  final picked = await Services.selectDate(context);
-                  if (picked != null && picked != _selectedDate) {
-                    setState(() {
-                      _selectedDate = picked;
-                      dob = DateFormat('dd MMM yyyy').format(picked);
-                    });
-                  }
-                },
-                child: AbsorbPointer(
-                  child: CommonTextfield(
-                    enabled: makeEditable,
-                    hintText: 'Select your date of birth',
-                    controller: TextEditingController(
-                      text: dob != ""
-                          ? dob
-                          : _selectedDate != null
-                              ? dob
-                              : '',
-                    ),
-                    validator: (value) {
-                      if (_selectedDate == null) {
-                        return 'Please select your date of birth';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                style: TextStyle(
-                    fontSize: 16,
-                    color: makeEditable
-                        ? Colors.black
-                        : Colors.grey.withOpacity(0.9)),
-                decoration: InputDecoration(
-                  labelText: "Gender",
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: makeEditable
-                            ? Colors.black
-                            : Colors.grey.withOpacity(0.2)),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.red),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: makeEditable
-                            ? Colors.black
-                            : Colors.grey.withOpacity(0.2)),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                value: ((gender) == "") ? null : gender,
-                items: genderOptions.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: const TextStyle(),
-                    ),
-                  );
-                }).toList(),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select your Gender';
-                  }
-                  return null;
-                },
-                onChanged: (String? newValue) {
-                  setState(() {
-                    gender = newValue!;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
-                borderRadius: BorderRadius.circular(8),
-                decoration: InputDecoration(
-                  labelText: "Employment Status",
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: makeEditable ? Colors.black : Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.red),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: makeEditable
-                            ? Colors.black
-                            : Colors.grey.withOpacity(0.2)),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                value:
-                    ((employmentStatus ?? "") == "") ? null : employmentStatus,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select your Employment Status';
-                  }
-                  return null;
-                },
-                items: employmentStatusOptions.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    employmentStatus = newValue!;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              CommonTextfield(
-                enabled: makeEditable,
-                controller: employeeAddressController,
-                maxLines: 3,
-                hintText: 'Employee Address',
-                onSaved: (value) {
-                  employeeAddress = value!;
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your address';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () async {
-                  if (_formKey.currentState!.validate()) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      },
-                    );
-
-                    _formKey.currentState!.save();
-
-                    print('Name: $name');
-                    print('Age: $age');
-                    print('Email: $email');
-                    print('DOB: $dob');
-                    print('Gender: $gender');
-                    print('Employment Status: $employmentStatus');
-                    print('Employee Address: $employeeAddress');
-
-                    final pdfFile = await Services.generatePdf(
-                      address: employeeAddress,
-                      age: age,
-                      dob: dob,
-                      email: email,
-                      employmentStatus: employmentStatus ?? "NA",
-                      gender: gender ?? "NA",
-                      name: name,
-                    );
-
-                    final data = {
-                      "address": employeeAddress,
-                      "age": age,
-                      "dob": dob,
-                      "email": email,
-                      "employmentStatus": employmentStatus ?? "NA",
-                      "gender": gender ?? "NA",
-                      "name": name,
-                    };
-
-                    await Services.uploadPdfToSFTP(pdfFile, name);
-                    await Services.storeUserData(data);
-
-                    await Services.uploadPDFToFirebase(
-                        pdfFile: pdfFile, username: name);
-
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => InfoFormScreen(),
-                      ),
-                      (route) => false,
-                    );
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.shade300,
-                        offset: const Offset(0.0, 0.0),
-                        spreadRadius: 1.0,
-                        blurRadius: 10,
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(8.0),
-                    color: Colors.white,
-                  ),
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              retrievedData == null
-                  ? const SizedBox()
-                  : Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                makeEditable = !makeEditable;
-                              });
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.black),
-                              ),
-                              child: const Text(
-                                "Edit",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () async {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                },
-                              );
-                              await Services.removeUserData();
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => InfoFormScreen(),
-                                ),
-                                (route) => false,
-                              );
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.red),
-                              ),
-                              child: const Text(
-                                "Delete",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildTextField(
+                    "Name", usernameController, "Please enter your name"),
+                const SizedBox(height: 20),
+                _buildTextField("Age", ageController, "Please enter your age",
+                    keyboardType: TextInputType.number),
+                const SizedBox(height: 20),
+                _buildTextField(
+                    "Email ID", emailIdController, "Please enter your email ID",
+                    keyboardType: TextInputType.emailAddress),
+                const SizedBox(height: 20),
+                _buildDatePicker(),
+                const SizedBox(height: 20),
+                _buildDropdownField("Gender", genderOptions, gender,
+                    (value) => gender = value, "Please select your Gender"),
+                const SizedBox(height: 20),
+                _buildDropdownField(
+                    "Employment Status",
+                    employmentStatusOptions,
+                    employmentStatus,
+                    (value) => employmentStatus = value,
+                    "Please select your Employment Status"),
+                const SizedBox(height: 20),
+                _buildTextField("Employee Address", employeeAddressController,
+                    "Please enter your address",
+                    maxLines: 3),
+                const SizedBox(height: 20),
+                _buildSubmitButton(),
+                const SizedBox(height: 20),
+                retrievedData != null ? _buildDeleteButton() : const SizedBox(),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(
+      String hint, TextEditingController controller, String validationMessage,
+      {TextInputType keyboardType = TextInputType.text, int maxLines = 1}) {
+    return CommonTextfield(
+      hintText: hint,
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return validationMessage;
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return GestureDetector(
+      onTap: () async {
+        final picked =
+            await Services.selectDate(context, DateTime(1999, 12, 14));
+        if (picked != null) {
+          setState(() {
+            _selectedDate = picked;
+            dob = DateFormat('dd MMM yyyy').format(_selectedDate!);
+          });
+        }
+      },
+      child: AbsorbPointer(
+        child: CommonTextfield(
+          hintText: 'Select your date of birth',
+          controller: TextEditingController(text: dob),
+          validator: (value) {
+            if (dob.isEmpty) {
+              return 'Please select your date of birth';
+            }
+            return null;
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownField(
+      String label,
+      List<String> options,
+      String? selectedValue,
+      Function(String?) onChanged,
+      String validationMessage) {
+    return DropdownButtonFormField<String>(
+      value: ((selectedValue ?? "").isEmpty) ? null : selectedValue,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+      ),
+      items: options.map((String value) {
+        return DropdownMenuItem<String>(value: value, child: Text(value));
+      }).toList(),
+      validator: (value) =>
+          value == null || value.isEmpty ? validationMessage : null,
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return GestureDetector(
+      onTap: () async {
+        if (_formKey.currentState!.validate()) {
+          setState(() => loading = true);
+          final data = {
+            "name": usernameController.text,
+            "age": ageController.text,
+            "dob": dob,
+            "email": emailIdController.text,
+            "gender": gender ?? "NA",
+            "employmentStatus": employmentStatus ?? "NA",
+            "address": employeeAddressController.text,
+          };
+
+          final pdfFile = await Services.generatePdf(
+            address: employeeAddressController.text,
+            age: ageController.text,
+            dob: dob,
+            email: emailIdController.text,
+            employmentStatus: employmentStatus ?? "NA",
+            gender: gender ?? "NA",
+            name: usernameController.text,
+          );
+
+          if (retrievedData == null) {
+            await Services.uploadPdfToSFTP(pdfFile, usernameController.text);
+            await Services.storeUserData(data);
+            await Services.uploadPDFToFirebase(
+                pdfFile: pdfFile, username: usernameController.text);
+          } else {
+            await Services.uploadAndReplacePdfOnSFTP(
+                context, pdfFile, usernameController.text);
+            await Services.updatePdfInFirebase(
+                pdf: pdfFile, name: usernameController.text);
+            await Services.storeUserData(data);
+          }
+
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => InfoFormScreen()));
+          setState(() => loading = false);
+        }
+      },
+      child: _buildLoadingButton(
+          loading, retrievedData == null ? 'Save' : 'Update'),
+    );
+  }
+
+  Widget _buildDeleteButton() {
+    return GestureDetector(
+      onTap: () async {
+        setState(() => deleteLoading = true);
+        await Services.deletePdfInFirebase();
+        await Services.removeFileFromServer();
+        await Services.removeUserData();
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => InfoFormScreen()));
+        setState(() => deleteLoading = false);
+      },
+      child: _buildLoadingButton(deleteLoading, "Delete", color: Colors.red),
+    );
+  }
+
+  Widget _buildLoadingButton(bool isLoading, String label,
+      {Color color = Colors.black}) {
+    return Container(
+      height: 60,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: color),
+        borderRadius: BorderRadius.circular(8.0),
+        color: Colors.white,
+      ),
+      child: isLoading
+          ? const Center(
+              child: SizedBox(
+                  height: 20, width: 20, child: CircularProgressIndicator()))
+          : Text(label,
+              style:
+                  const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
     );
   }
 }
