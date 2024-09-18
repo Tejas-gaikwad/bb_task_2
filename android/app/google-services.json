@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "64658336848",
+    "project_id": "bb-task-2",
+    "storage_bucket": "bb-task-2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64658336848:android:c993c5a982032b4b597555",
+        "android_client_info": {
+          "package_name": "com.example.bb_ble_task_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZtkA9YUgl0BKLvhm15oIfrsOH6AvQsT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
