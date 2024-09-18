@@ -22,3 +22,39 @@ This Flutter application allows users to fill out a form with their personal inf
    ```bash
    git clone https://github.com/your-username/info-form-flutter-app.git
    cd info-form-flutter-app
+
+
+Install the dependencies:
+flutter pub get
+
+Run the application:
+flutter run
+
+flutter: Flutter framework for building cross-platform mobile apps.
+Custom widgets for text fields and form elements.
+External services (Firebase, SFTP) to upload and store data.
+
+
+Usage
+On app launch, if the user has already submitted data, the form will load with their previously submitted details.
+Users can fill in the form and submit their details by pressing the Save button. If the form is already populated, users can update their details.
+The data is saved as a PDF on the server, and the user can update or delete the document.
+All actions (submit, update, delete) are processed via backend services integrated with Firebase and SFTP.
+
+Core Functionality
+Data Submission: Upon successful form validation, the data is sent to a server where a PDF is generated, stored, and uploaded.
+Data Retrieval: On app start, the previously saved data is loaded into the form fields, allowing users to update or delete their information.
+PDF Generation: A user’s details are formatted into a PDF file using a third-party service, and uploaded to both Firebase and an SFTP server.
+Backend Integration
+The app integrates with external services for data management:
+
+Firebase: Used to store the user's data and the generated PDF.
+SFTP Server: The PDF is uploaded to an SFTP server.
+Custom Services: The project uses a custom service layer (lib/services/common_services.dart) to handle all backend communication.
+
+
+
+
+
+
+
