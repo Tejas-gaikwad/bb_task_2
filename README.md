@@ -25,7 +25,7 @@ This Flutter application allows users to fill out a form with their personal inf
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/info-form-flutter-app.git
+   git clone https://github.com/tejas-gaikwad/bb_task_2.git
    cd info-form-flutter-app
 
 
