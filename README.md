@@ -14,10 +14,8 @@ This Flutter application allows users to fill out a form with their personal inf
 ## Screenshots
 
 <img src="https://github.com/user-attachments/assets/11087a17-098b-4ed3-97e0-ac566abd8a51" alt="description" width="300"/>
-![image](https://github.com/user-attachments/assets/79a70038-2eaf-4559-ab35-576c1e7d4b0e)
-![image](https://github.com/user-attachments/assets/22e39160-9bea-4e7c-a476-7f70595d8ea1)
-
-
+<img src="https://github.com/user-attachments/assets/79a70038-2eaf-4559-ab35-576c1e7d4b0e" alt="description" width="700"/>
+<img src="https://github.com/user-attachments/assets/22e39160-9bea-4e7c-a476-7f70595d8ea1" alt="description" width="300"/>
 
 
 <!-- Include screenshots of the app interface -->
